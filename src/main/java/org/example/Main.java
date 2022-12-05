@@ -7,40 +7,54 @@ public class Main {
     static AtomicInteger threeLetterCount = new AtomicInteger();
     static AtomicInteger fourLetterCount = new AtomicInteger();
     static AtomicInteger fiveLetterCount = new AtomicInteger();
+
     public static void main(String[] args) {
 
         // TODO: 04.12.2022  Создайте генератор текстов и сгенерируйте набор из 100'000 текстов, используя код из описания задачи.
         // TODO: 04.12.2022  Заведите в статических полях три счётчика - по одному для длин: 3, 4 и 5.
         // TODO: 04.12.2022  Заведите три потока - по одному на каждый критерий "красоты" слова. Каждый поток проверяет все тексты на "красоту" и увеличивает счётчик нужной длины, если текст соответствует критериям.
         // TODO: 04.12.2022  После окончания работы всех потоков выведите результаты на экран.
-        AtomicInteger count = new AtomicInteger();
         Random random = new Random();
         String[] texts = new String[100_000];
         for (int i = 0; i < texts.length; i++) {
             texts[i] = generateText("abc", 3 + random.nextInt(3));
         }
-        new Thread(() -> {
-            for (String word: texts) {
+        Thread thread1 = new Thread(() -> {
+            for (String word : texts) {
                 isPalindrome(word);
             }
-            count.getAndIncrement();
-        }).start();
-        new Thread(() -> {
-            for (String word: texts) {
+        });
+        thread1.start();
+        try {
+            thread1.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Thread thread2 = new Thread(() -> {
+            for (String word : texts) {
                 isOneLetter(word);
             }
-            count.getAndIncrement();
-        }).start();
-        new Thread(() -> {
-            for (String word: texts) {
+        });
+        thread2.start();
+        try {
+            thread2.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Thread thread3 = new Thread(() -> {
+            for (String word : texts) {
                 isAlphabeticalOrder(word);
             }
-            count.getAndIncrement();
-        }).start();
-        while (count.get() != 3);
-            System.out.println("Красивых слов с длиной 3: " + threeLetterCount + " шт.");
-            System.out.println("Красивых слов с длиной 4: " + fourLetterCount + " шт.");
-            System.out.println("Красивых слов с длиной 5: " + fiveLetterCount + " шт.");
+        });
+        thread3.start();
+        try {
+            thread3.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Красивых слов с длиной 3: " + threeLetterCount + " шт.");
+        System.out.println("Красивых слов с длиной 4: " + fourLetterCount + " шт.");
+        System.out.println("Красивых слов с длиной 5: " + fiveLetterCount + " шт.");
 
 
     }
@@ -55,7 +69,7 @@ public class Main {
     }
 
     // проверка на палиндром
-    static public void isPalindrome (String word) {
+    static public void isPalindrome(String word) {
         char[] charAr = word.toCharArray();
         boolean ok = true;
         for (int i = 0; i < charAr.length / 2; i++) {
