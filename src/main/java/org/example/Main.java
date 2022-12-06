@@ -21,7 +21,7 @@ public class Main {
         }
         Thread thread1 = new Thread(() -> {
             for (String word : texts) {
-                isPalindrome(word);
+                if (isOneLetter(word)) count(word);
             }
         });
         thread1.start();
@@ -32,7 +32,7 @@ public class Main {
         }
         Thread thread2 = new Thread(() -> {
             for (String word : texts) {
-                isOneLetter(word);
+                if (isAlphabeticalOrder(word) && !isOneLetter(word)) count(word);
             }
         });
         thread2.start();
@@ -43,7 +43,7 @@ public class Main {
         }
         Thread thread3 = new Thread(() -> {
             for (String word : texts) {
-                isAlphabeticalOrder(word);
+                if (isPalindrome(word) && !isOneLetter(word)) count(word);
             }
         });
         thread3.start();
@@ -68,8 +68,39 @@ public class Main {
         return text.toString();
     }
 
+    //проверка на то, что слово состоит из одной и той же буквы
+
+    public static boolean isOneLetter(String word) {
+        char temp = word.charAt(0);
+        boolean ok = true;
+        for (char letter : word.toCharArray()) {
+            if (letter != temp) {
+                ok = false;
+                break;
+            }
+        }
+        return ok;
+    }
+
+    //проверка на то, что буквы идут в алфавитном порядке
+
+    public static boolean isAlphabeticalOrder(String word) {
+        char temp = word.charAt(0);
+        boolean ok = true;
+        for (char letter : word.toCharArray()) {
+            if (temp != letter && temp > letter) {
+                ok = false;
+                break;
+            } else {
+                temp = letter;
+            }
+        }
+        return ok;
+    }
+
     // проверка на палиндром
-    static public void isPalindrome(String word) {
+
+    static public boolean isPalindrome(String word) {
         char[] charAr = word.toCharArray();
         boolean ok = true;
         for (int i = 0; i < charAr.length / 2; i++) {
@@ -78,46 +109,14 @@ public class Main {
                 break;
             }
         }
-        if (ok && word.length() == 3) threeLetterCount.getAndIncrement();
-        else if (ok && word.length() == 4) fourLetterCount.getAndIncrement();
-        else if (ok && word.length() == 5) fiveLetterCount.getAndIncrement();
+        return ok;
     }
 
-    //проверка на то, что слово состоит из одной и той же буквы
+    // работа со счетчиком
 
-    public static void isOneLetter(String word) {
-        char[] charAr = word.toCharArray();
-        char temp = charAr[0];
-        boolean ok = true;
-        for (char letter : charAr) {
-            if (letter != temp) {
-                ok = false;
-                break;
-            }
-        }
-        if (ok && word.length() == 3) threeLetterCount.getAndIncrement();
-        else if (ok && word.length() == 4) fourLetterCount.getAndIncrement();
-        else if (ok && word.length() == 5) fiveLetterCount.getAndIncrement();
-    }
-
-    public static void isAlphabeticalOrder(String word) {
-        char[] charAr = word.toCharArray();
-        char temp = charAr[0];
-        boolean ok = true;
-        if ((word.contains("a") && word.contains("b"))
-                || (word.contains("a") && word.contains("c"))
-                || (word.contains("c") && word.contains("b"))) {
-            for (char letter : charAr) {
-                if (temp != letter && temp > letter) {
-                    ok = false;
-                    break;
-                } else {
-                    temp = letter;
-                }
-            }
-        } else ok = false;
-        if (ok && word.length() == 3) threeLetterCount.getAndIncrement();
-        else if (ok && word.length() == 4) fourLetterCount.getAndIncrement();
-        else if (ok && word.length() == 5) fiveLetterCount.getAndIncrement();
+    public static void count(String word) {
+        if (word.length() == 3) threeLetterCount.getAndIncrement();
+        else if (word.length() == 4) fourLetterCount.getAndIncrement();
+        else if (word.length() == 5) fiveLetterCount.getAndIncrement();
     }
 }
