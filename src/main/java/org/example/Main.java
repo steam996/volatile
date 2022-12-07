@@ -19,35 +19,31 @@ public class Main {
         for (int i = 0; i < texts.length; i++) {
             texts[i] = generateText("abc", 3 + random.nextInt(3));
         }
+        long startTs = System.currentTimeMillis();
         Thread thread1 = new Thread(() -> {
             for (String word : texts) {
                 if (isOneLetter(word)) count(word);
             }
         });
         thread1.start();
-        try {
-            thread1.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         Thread thread2 = new Thread(() -> {
             for (String word : texts) {
                 if (isAlphabeticalOrder(word) && !isOneLetter(word)) count(word);
             }
         });
         thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         Thread thread3 = new Thread(() -> {
             for (String word : texts) {
                 if (isPalindrome(word) && !isOneLetter(word)) count(word);
             }
         });
         thread3.start();
+
         try {
+            thread1.join();
+            thread2.join();
             thread3.join();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -55,7 +51,8 @@ public class Main {
         System.out.println("Красивых слов с длиной 3: " + threeLetterCount + " шт.");
         System.out.println("Красивых слов с длиной 4: " + fourLetterCount + " шт.");
         System.out.println("Красивых слов с длиной 5: " + fiveLetterCount + " шт.");
-
+        long endTs = System.currentTimeMillis();
+        System.out.println("Time: " + (endTs - startTs) + "ms");
 
     }
 
